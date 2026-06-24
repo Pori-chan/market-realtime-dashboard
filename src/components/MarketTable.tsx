@@ -1,6 +1,6 @@
-import {mockMarketData} from "../data/mockMarketData";
+import type{MarketData} from "../types/market";
 
-export function MarketTable(){
+export function MarketTable({ data }: { data: MarketData[] }) {
     return (
         <table>
             <thead>
@@ -12,7 +12,7 @@ export function MarketTable(){
             </thead>
 
             <tbody>
-                {mockMarketData.map((item)=>(
+                {data.map((item) => (
                     <tr key={item.symbol}>
                         <td>{item.symbol}</td>
                         <td>{item.price}</td>

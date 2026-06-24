@@ -1,7 +1,13 @@
-function App(){
+import { Header } from "./components/Header";
+import { MarketTable } from "./components/MarketTable";
+import { StatsPanel } from "./components/StatsPanel";
+
+function App() {
   return (
     <div>
-      <h1>Market Dashboard</h1>
+      <Header/>
+      <MarketTable/>
+      <StatsPanel/>
     </div>
   );
 }

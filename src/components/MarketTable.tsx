@@ -16,8 +16,8 @@ export function MarketTable({ data }: { data: MarketData[] }) {
                     <tr key={item.symbol}>
                         <td>{item.symbol}</td>
                         <td>{item.price}</td>
-                        <td>
-                            {item.changePercent > 0 ? "+": ""}
+                        <td className={item.changePercent >= 0 ? "positive" : "negative"}>
+                            {item.changePercent > 0 ? "+" : ""}
                             {item.changePercent}%
                         </td>
                     </tr>

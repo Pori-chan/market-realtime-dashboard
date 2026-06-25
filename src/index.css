@@ -25,3 +25,10 @@ td {
   border-bottom: 1px solid #333;
   text-align: left;
 }
+
+.positive{
+  color:#4ade80;
+}
+.negative{
+  color:#f87171;
+}

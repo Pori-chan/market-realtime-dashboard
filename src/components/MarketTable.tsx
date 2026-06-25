@@ -1,4 +1,4 @@
-import type{MarketData} from "../types/market";
+import type { MarketData } from "../types/market";
 
 export function MarketTable({ data }: { data: MarketData[] }) {
     return (
@@ -16,7 +16,10 @@ export function MarketTable({ data }: { data: MarketData[] }) {
                     <tr key={item.symbol}>
                         <td>{item.symbol}</td>
                         <td>{item.price}</td>
-                        <td>{item.changePercent}</td>
+                        <td>
+                            {item.changePercent > 0 ? "+": ""}
+                            {item.changePercent}%
+                        </td>
                     </tr>
                 ))}
             </tbody>

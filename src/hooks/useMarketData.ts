@@ -1,17 +1,14 @@
 import { useEffect, useState } from "react";
+import { getInitialMarketData, updateMockMarketData } from "../providers/MockMarketDataProvider";
 import type { MarketData } from "../types/market";
-import { mockMarketData } from "../data/mockMarketData";
-import { updateRandomMarketItems } from "../utils/marketUpdater";
 
 
 export function useMarketData(): MarketData[] {
-    const [marketData, setMarketData] = useState<MarketData[]>(mockMarketData);
+    const [marketData, setMarketData] = useState<MarketData[]>(getInitialMarketData);
 
     useEffect(() => {
         const timer = setInterval(() => {
-            setMarketData((currentData) => {
-                return updateRandomMarketItems(currentData, 10);
-            });
+            setMarketData(updateMockMarketData(10));
         }, 1000);
 
         return () => clearInterval(timer);

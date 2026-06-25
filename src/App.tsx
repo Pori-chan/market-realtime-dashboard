@@ -4,7 +4,7 @@ import { StatsPanel } from "./components/StatsPanel";
 import { useMarketData } from "./hooks/useMarketData";
 
 function App() {
-  console.count("App rendered");
+  // console.count("App rendered");
 
   const marketData = useMarketData();
 

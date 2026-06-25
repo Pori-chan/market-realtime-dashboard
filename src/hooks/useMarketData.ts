@@ -1,17 +1,18 @@
 import { useEffect, useState } from "react";
-import { getInitialMarketData, updateMockMarketData } from "../providers/MockMarketDataProvider";
+import { getInitialMarketData, subscribeMarketData, updateMockMarketData } from "../providers/MockMarketDataProvider";
 import type { MarketData } from "../types/market";
+
 
 
 export function useMarketData(): MarketData[] {
     const [marketData, setMarketData] = useState<MarketData[]>(getInitialMarketData);
 
     useEffect(() => {
-        const timer = setInterval(() => {
-            setMarketData(updateMockMarketData(10));
-        }, 1000);
+        const unsubscribe = subscribeMarketData(setMarketData);
 
-        return () => clearInterval(timer);
+        return () => {
+            unsubscribe();
+        };
     }, []);
 
     return marketData;

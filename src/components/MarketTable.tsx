@@ -6,7 +6,7 @@ type MarketTableProps = {
 };
 
 export function MarketTable({ data }: MarketTableProps) {
-    console.log("MarketTable rendered");
+    // console.log("MarketTable rendered");
 
     return (
         <table>

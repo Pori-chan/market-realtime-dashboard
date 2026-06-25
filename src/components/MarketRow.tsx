@@ -6,7 +6,7 @@ type MarketRowProps = {
 }
 
 export const MarketRow = memo(function MarketRow({ item }: MarketRowProps) {
-    console.count(`MarketRow:${item.symbol}`);
+    // console.count(`MarketRow:${item.symbol}`);
     return (
         <tr>
             <td>{item.symbol}</td>

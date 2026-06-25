@@ -10,10 +10,15 @@ function App() {
   useEffect(() => {
     const timer = setInterval(() => {
       setMarketData((currentData) => {
-        const targetIndex = Math.floor(Math.random() * currentData.length);
+        const updateCount = 10;
+        const targetIndexes = new Set<number>();
+
+        while(targetIndexes.size<updateCount){
+          targetIndexes.add(Math.floor(Math.random()*currentData.length));
+        }
 
         return currentData.map((item, index) => {
-          if (index !== targetIndex) {
+          if (!targetIndexes.has(index)) {
             return item;
           }
 

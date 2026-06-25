@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { mockMarketData } from "./data/mockMarketData";
 
 function App() {
+  console.count("App rendered");
   const [marketData, setMarketData] = useState(mockMarketData);
   useEffect(() => {
     const timer = setInterval(() => {

@@ -1,12 +1,12 @@
+import { memo } from "react";
 import type { MarketData } from "../types/market";
 
 type MarketRowProps = {
     item: MarketData;
 }
 
-export function MarketRow({ item }: MarketRowProps) {
+export const MarketRow = memo(function MarketRow({ item }: MarketRowProps) {
     console.count(`MarketRow:${item.symbol}`);
-
     return (
         <tr>
             <td>{item.symbol}</td>
@@ -17,4 +17,4 @@ export function MarketRow({ item }: MarketRowProps) {
             </td>
         </tr>
     );
-}
+})

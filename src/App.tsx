@@ -9,21 +9,24 @@ function App() {
   useEffect(() => {
     const timer = setInterval(() => {
       setMarketData((currentData) => {
+        const targetIndex = Math.floor(Math.random() * currentData.length);
 
-        const updatedData = currentData.map((item) => {
+        return currentData.map((item, index) => {
+          if (index !== targetIndex) {
+            return item;
+          }
+
           const priceDiff = (Math.random() - 0.5) * 2;
-          const nextPrice = Number((item.price+priceDiff).toFixed(2));
-          const changePercent = Number(((priceDiff/item.price)*100).toFixed(2));
-
+          const nextPrice = Number((item.price + priceDiff).toFixed(2));
+          const nextChangePercent = Number((priceDiff / item.price * 100).toFixed(2));
+          0
           return {
             ...item,
             price: nextPrice,
-            changePercent,
-            updatedAt: Date.now(),
+            changePercent: nextChangePercent,
+            updateAt: Date.now(),
           };
         });
-
-        return updatedData;
       });
     }, 1000);
 

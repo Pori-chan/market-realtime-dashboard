@@ -1,6 +1,13 @@
 import type { MarketData } from "../types/market";
+import { MarketRow } from "./MarketRow";
 
-export function MarketTable({ data }: { data: MarketData[] }) {
+type MarketTableProps = {
+    data: MarketData[];
+};
+
+export function MarketTable({ data }: MarketTableProps) {
+    console.log("MarketTable rendered");
+
     return (
         <table>
             <thead>
@@ -13,14 +20,7 @@ export function MarketTable({ data }: { data: MarketData[] }) {
 
             <tbody>
                 {data.map((item) => (
-                    <tr key={item.symbol}>
-                        <td>{item.symbol}</td>
-                        <td>{item.price}</td>
-                        <td className={item.changePercent >= 0 ? "positive" : "negative"}>
-                            {item.changePercent > 0 ? "+" : ""}
-                            {item.changePercent}%
-                        </td>
-                    </tr>
+                    <MarketRow key={item.symbol} item={item} />
                 ))}
             </tbody>
         </table>

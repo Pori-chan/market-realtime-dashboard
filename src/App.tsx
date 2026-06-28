@@ -6,11 +6,15 @@ import { useEffect, useState } from "react";
 import { connectFinnhub } from "./services/finnhubService";
 import type { FinnhubMessage } from "./types/finnhub";
 import type { Trade } from "./types/trade";
+import type { Language } from "./types/language";
+import { messages } from "./i18n/messages";
 
 
 function App() {
   const [connected, setConnected] = useState(false);
   const [trades, setTrades] = useState<Trade[]>([]);
+  const [language,setLanguage]=useState<Language>("ja");
+  const t = messages[language];
 
   useEffect(() => {
     const socket = connectFinnhub();
@@ -56,12 +60,12 @@ function App() {
   }, []);
   return (
     <>
-      <Header connected={connected} />
+      <Header connected={connected} language={language} onLanguageChange={setLanguage} t={t} />
 
       <main className="dashboard">
-        <WatchList />
-        <TradeStream trades={trades}/>
-        <StatsPanel />
+        <WatchList title={t.watchList}/>
+        <TradeStream title={t.tradeStream} trades={trades}/>
+        <StatsPanel title={t.statistics}/>
       </main>
     </>
   )

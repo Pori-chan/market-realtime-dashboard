@@ -1,9 +1,13 @@
 import { watchList } from "../data/watchList";
 
-export function WatchList() {
+type WatchListProps = {
+  title: string;
+};
+
+export function WatchList({ title }: WatchListProps) {
   return (
     <section className="panel">
-      <h2>Watch List</h2>
+      <h2>{title}</h2>
 
       {watchList.map((stock) => (
         <div className="watch-item" key={stock.symbol}>

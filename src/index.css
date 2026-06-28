@@ -99,3 +99,17 @@ body {
 .trade-row span:nth-child(4) {
   text-align: right;
 }
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.language-select {
+  background: #020617;
+  color: #e5e7eb;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 6px 10px;
+}

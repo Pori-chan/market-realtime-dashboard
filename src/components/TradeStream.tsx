@@ -2,12 +2,13 @@ import type { Trade } from "../types/trade"
 
 type TradeStreamProps = {
     trades: Trade[];
+    title: string;
 };
 
-export function TradeStream({ trades }: TradeStreamProps) {
+export function TradeStream({ trades,title }: TradeStreamProps) {
     return (
         <section className="panel">
-            <h2>Trade Stream</h2>
+            <h2>{title}</h2>
 
             <div className="trade-list">
                 {trades.map((trade)=>(

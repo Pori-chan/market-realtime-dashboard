@@ -118,3 +118,21 @@ body {
   font-size: 13px;
   color: #94a3b8;
 }
+
+.demo-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #cbd5e1;
+}
+
+.demo-status {
+  font-size: 13px;
+  color: #64748b;
+}
+
+.demo-status.active {
+  color: #facc15;
+  font-weight: bold;
+}

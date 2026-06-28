@@ -8,9 +8,11 @@ type HeaderProps = {
     onLanguageChange: (language: Language) => void;
     t: Record<string, string>;
     marketSession: MarketSessionInfo;
+    demoMode: boolean;
+    onDemoModeChange: (enabled: boolean) => void;
 }
 
-export function Header({ connected, language, onLanguageChange, t, marketSession }: HeaderProps) {
+export function Header({ connected, language, onLanguageChange, t, marketSession, demoMode, onDemoModeChange }: HeaderProps) {
     return (
         <header className="header">
             <h1>💹 {t.title}</h1>
@@ -24,6 +26,18 @@ export function Header({ connected, language, onLanguageChange, t, marketSession
             <div className="header-actions">
                 <div className={connected ? "status connected" : "status disconnected"} >
                     ● {connected ? t.connected : t.disconnected}
+                </div>
+
+                <label className="demo-toggle">
+                    <input
+                        type="checkbox"
+                        checked={demoMode}
+                        onChange={(event) => onDemoModeChange(event.target.checked)}
+                    />
+                    {t.demoMode}
+                </label>
+                <div className={demoMode ? "demo-status active" : "demo-status"}>
+                    {demoMode ? t.demoRunning : t.demoOff}
                 </div>
 
                 <select

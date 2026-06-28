@@ -18,6 +18,7 @@ function App() {
   const [trades, setTrades] = useState<Trade[]>([]);
   const [language, setLanguage] = useState<Language>("ja");
   const [marketSession, setMarketSession] = useState(getUsMarketSessionInfo());
+  const [demoMode, setDemoMode] = useState(false);
   const t = messages[language];
 
   useEffect(() => {
@@ -38,7 +39,7 @@ function App() {
   })
 
   useEffect(() => {
-    if (marketSession.isOpen) return;
+    if (marketSession.isOpen || !demoMode) return;
 
     const timer = setInterval(() => {
       const mockTrade = generateMockTrade();
@@ -49,7 +50,7 @@ function App() {
     }, 500);
 
     return () => clearInterval(timer);
-  }, [marketSession.isOpen])
+  }, [marketSession.isOpen, demoMode])
 
   useEffect(() => {
     const socket = connectFinnhub();
@@ -95,7 +96,15 @@ function App() {
   }, []);
   return (
     <>
-      <Header connected={connected} language={language} onLanguageChange={setLanguage} t={t} marketSession={marketSession} />
+      <Header 
+      connected={connected} 
+      language={language} 
+      onLanguageChange={setLanguage} 
+      t={t} 
+      marketSession={marketSession}
+      demoMode={demoMode}
+      onDemoModeChange={setDemoMode}
+      />
 
       <main className="dashboard">
         <WatchList title={t.watchList} />

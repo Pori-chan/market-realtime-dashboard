@@ -8,13 +8,33 @@ import type { FinnhubMessage } from "./types/finnhub";
 import type { Trade } from "./types/trade";
 import type { Language } from "./types/language";
 import { messages } from "./i18n/messages";
+import { fetchUsMarketStatus } from "./services/finnhubService";
+import { getUsMarketSessionInfo } from "./utils/usMarketHours";
 
 
 function App() {
   const [connected, setConnected] = useState(false);
   const [trades, setTrades] = useState<Trade[]>([]);
-  const [language,setLanguage]=useState<Language>("ja");
+  const [language, setLanguage] = useState<Language>("ja");
+  const [marketSession, setMarketSession] = useState(getUsMarketSessionInfo());
   const t = messages[language];
+
+  useEffect(() => {
+    fetchUsMarketStatus().then((status) => {
+      console.log("market status", status);
+    })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, []);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setMarketSession(getUsMarketSessionInfo());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  })
 
   useEffect(() => {
     const socket = connectFinnhub();
@@ -60,12 +80,12 @@ function App() {
   }, []);
   return (
     <>
-      <Header connected={connected} language={language} onLanguageChange={setLanguage} t={t} />
+      <Header connected={connected} language={language} onLanguageChange={setLanguage} t={t} marketSession={marketSession} />
 
       <main className="dashboard">
-        <WatchList title={t.watchList}/>
-        <TradeStream title={t.tradeStream} trades={trades}/>
-        <StatsPanel title={t.statistics}/>
+        <WatchList title={t.watchList} />
+        <TradeStream title={t.tradeStream} trades={trades} />
+        <StatsPanel title={t.statistics} />
       </main>
     </>
   )

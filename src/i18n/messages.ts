@@ -10,6 +10,8 @@ export const messages: Record<Language,Record<string,string>>={
         disconnected:"未接続",
         setting:"設定",
         language:"言語",
+        opening:"開場中",
+        nextOpen:"次回開場まで",
     },
     en:{
         title:"Live Market Dashboard",
@@ -20,5 +22,7 @@ export const messages: Record<Language,Record<string,string>>={
         disconnected:"Disconnected",
         settings:"Settings",
         language:"Language",
+        opening:"Market Open",
+        nextOpen:"Next Open in"
     },
 };

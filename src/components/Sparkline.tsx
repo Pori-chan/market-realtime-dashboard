@@ -1,8 +1,9 @@
 type SparklineProps = {
     values: number[];
+    trend: "up" | "down" | "flat";
 };
 
-export function Sparkline({ values }: SparklineProps) {
+export function Sparkline({ values, trend }: SparklineProps) {
     const width = 80;
     const height = 28;
 
@@ -24,7 +25,10 @@ export function Sparkline({ values }: SparklineProps) {
         .join(" ");
 
     return (
-        <svg className="sparkline" width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
+        <svg className={`sparkline sparkline-${trend}`}
+            width={width}
+            height={height}
+            viewBox={`0 0 ${width} ${height}`}>
             <polyline points={points} fill="none" stroke="currentColor" strokeWidth="2" />
         </svg>
     );

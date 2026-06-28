@@ -79,8 +79,16 @@ body {
   font-weight: bold;
 }
 
-.sparkline {
+.sparkline-flat {
   color: #38bdf8;
+}
+
+.sparkline-up {
+  color: #22c55e;
+}
+
+.sparkline-down {
+  color: #ef4444
 }
 
 .flash-up {

@@ -24,9 +24,6 @@ export function Header({ connected, language, onLanguageChange, t, marketSession
             </div>
 
             <div className="header-actions">
-                <div className={connected ? "status connected" : "status disconnected"} >
-                    ● {connected ? t.connected : t.disconnected}
-                </div>
 
                 <label className="demo-toggle">
                     <input
@@ -34,10 +31,14 @@ export function Header({ connected, language, onLanguageChange, t, marketSession
                         checked={demoMode}
                         onChange={(event) => onDemoModeChange(event.target.checked)}
                     />
-                    {t.demoMode}
+
+                    <div className={demoMode ? "demo-status active" : "demo-status"}>
+                        {demoMode ? t.demoRunning : t.demoOff}
+                    </div>
                 </label>
-                <div className={demoMode ? "demo-status active" : "demo-status"}>
-                    {demoMode ? t.demoRunning : t.demoOff}
+
+                <div className={connected ? "status connected" : "status disconnected"} >
+                    ● {connected ? t.connected : t.disconnected}
                 </div>
 
                 <select

@@ -8,9 +8,10 @@ import type { FinnhubMessage } from "./types/finnhub";
 import type { Trade } from "./types/trade";
 import type { Language } from "./types/language";
 import { messages } from "./i18n/messages";
-import { fetchUsMarketStatus } from "./services/finnhubService";
 import { getUsMarketSessionInfo } from "./utils/usMarketHours";
 import { generateMockTrade } from "./utils/mockTrade";
+import type { Market } from "./types/markets";
+import { watchList } from "./data/watchList";
 
 
 function App() {
@@ -19,16 +20,8 @@ function App() {
   const [language, setLanguage] = useState<Language>("ja");
   const [marketSession, setMarketSession] = useState(getUsMarketSessionInfo());
   const [demoMode, setDemoMode] = useState(false);
+  const [markets, setMarkets] = useState<Market[]>(watchList);
   const t = messages[language];
-
-  useEffect(() => {
-    fetchUsMarketStatus().then((status) => {
-      console.log("market status", status);
-    })
-      .catch((error) => {
-        console.error(error);
-      });
-  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -47,6 +40,23 @@ function App() {
       setTrades((currentTrades) => {
         return [mockTrade, ...currentTrades].slice(0, 100);
       });
+
+       setMarkets((currentMarkets) => {
+          return currentMarkets.map((market) => {
+            if(market.symbol !== mockTrade.symbol) return market;
+
+            const previousPrice = market.price;
+            const nextPrice = mockTrade.price;
+            const nextChangePercent = ((nextPrice - previousPrice) / previousPrice) * 100;
+
+            return {
+              ...market,
+              price: nextPrice,
+              changePercent: Number(nextChangePercent.toFixed(2)),
+            };
+          });
+        });
+
     }, 500);
 
     return () => clearInterval(timer);
@@ -86,6 +96,26 @@ function App() {
         setTrades((currentTrades) => {
           return [...newTrades, ...currentTrades].slice(0, 100);
         });
+
+        setMarkets((currentMarkets) => {
+          return currentMarkets.map((market) => {
+            const latestTrade = newTrades.find(
+              (trade) => trade.symbol === market.symbol
+            );
+
+            if (!latestTrade) return market;
+
+            const previousPrice = market.price;
+            const nextPrice = latestTrade.price;
+            const nextChangePercent = ((nextPrice - previousPrice) / previousPrice) * 100;
+
+            return {
+              ...market,
+              price: nextPrice,
+              changePercent: Number(nextChangePercent.toFixed(2)),
+            };
+          });
+        });
       }
     };
 
@@ -96,18 +126,18 @@ function App() {
   }, []);
   return (
     <>
-      <Header 
-      connected={connected} 
-      language={language} 
-      onLanguageChange={setLanguage} 
-      t={t} 
-      marketSession={marketSession}
-      demoMode={demoMode}
-      onDemoModeChange={setDemoMode}
+      <Header
+        connected={connected}
+        language={language}
+        onLanguageChange={setLanguage}
+        t={t}
+        marketSession={marketSession}
+        demoMode={demoMode}
+        onDemoModeChange={setDemoMode}
       />
 
       <main className="dashboard">
-        <WatchList title={t.watchList} />
+        <WatchList title={t.watchList} markets={markets}/>
         <TradeStream title={t.tradeStream} trades={trades} />
         <StatsPanel title={t.statistics} />
       </main>

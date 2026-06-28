@@ -1,15 +1,16 @@
-import { watchList } from "../data/watchList";
+import type { Market } from "../types/markets";
 
 type WatchListProps = {
   title: string;
+  markets:Market[];
 };
 
-export function WatchList({ title }: WatchListProps) {
+export function WatchList({ title,markets }: WatchListProps) {
   return (
     <section className="panel">
       <h2>{title}</h2>
 
-      {watchList.map((stock) => (
+      {markets.map((stock) => (
         <div className="watch-item" key={stock.symbol}>
           <div>{stock.symbol}</div>
 

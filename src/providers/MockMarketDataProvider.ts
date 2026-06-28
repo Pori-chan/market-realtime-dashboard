@@ -1,6 +1,7 @@
 import { mockMarketData } from "../data/mockMarketData";
 import type { MarketData } from "../types/market";
 import { updateRandomMarketItems } from "../utils/marketUpdater";
+import { type MarketDataListener, type MarketDataProvider } from "./marketDataProvider";
 
 const UPDATE_INTERVAL_MS = 10;
 const UPDATE_COUNT_PER_TICK = 100;
@@ -27,8 +28,6 @@ function stopMockMarketDataFeed(): void {
 
 let marketData: MarketData[] = mockMarketData;
 
-type MarketDataListener = (data: MarketData[]) => void;
-
 let listeners = new Set<MarketDataListener>();
 
 export function subscribeMarketData(callback: MarketDataListener): () => void {
@@ -47,9 +46,11 @@ export function getInitialMarketData(): MarketData[] {
     return marketData;
 }
 
-export function updateMockMarketData(updateCount: number): void {
+function updateMockMarketData(updateCount: number): void {
     marketData = updateRandomMarketItems(marketData, updateCount);
     listeners.forEach((listener) => {
         listener(marketData);
     })
 }
+
+export const mockMarketDataProvider: MarketDataProvider = { getInitialMarketData, subscribe: subscribeMarketData, };

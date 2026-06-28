@@ -54,6 +54,8 @@ function App() {
             price: nextPrice,
             changePercent: Number(nextChangePercent.toFixed(2)),
             flash: nextPrice >= previousPrice ? "up" : "down",
+            flashKey: market.flashKey + 1,
+            history: [...market.history, nextPrice].slice(-20),
           };
         });
       });
@@ -115,6 +117,8 @@ function App() {
               price: nextPrice,
               changePercent: Number(nextChangePercent.toFixed(2)),
               flash: nextPrice >= previousPrice ? "up" : "down",
+              flashKey: market.flashKey + 1,
+              history: [...market.history, nextPrice].slice(-20),
             };
           });
         });

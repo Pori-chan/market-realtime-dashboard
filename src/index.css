@@ -51,9 +51,10 @@ body {
 }
 
 .watch-item {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 60px 90px 1fr;
   align-items: center;
+  gap: 12px;
   padding: 12px 0;
   border-bottom: 1px solid #1e293b;
 }
@@ -72,6 +73,14 @@ body {
   padding: 2px 6px;
   border-radius: 6px;
   transition: background-color 0.4s ease;
+}
+
+.watch-symbol {
+  font-weight: bold;
+}
+
+.sparkline {
+  color: #38bdf8;
 }
 
 .flash-up {

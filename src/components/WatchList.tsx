@@ -1,4 +1,5 @@
 import type { Market } from "../types/markets";
+import { Sparkline } from "./Sparkline";
 
 type WatchListProps = {
   title: string;
@@ -12,11 +13,16 @@ export function WatchList({ title, markets }: WatchListProps) {
 
       {markets.map((stock) => (
         <div className="watch-item" key={stock.symbol}>
-          <div>{stock.symbol}</div>
+          <div className="watch-symbol">{stock.symbol}</div>
+
+          <Sparkline values={stock.history} />
 
           <div className="watch-item-value">
-            <div className={`watch-price ${stock.flash === "up" ? "flash-up" : ""} ${stock.flash === "down" ? "flash-down" : ""}`}>
-              {`${stock.price.toFixed(2)}`}
+            <div key={stock.flashKey}
+              className={`watch-price ${stock.flash === "up" ? "flash-up" : ""
+                } ${stock.flash === "down" ? "flash-down" : ""}`}
+            >
+              {`$${stock.price.toFixed(2)}`}
             </div>
 
             <div className={stock.changePercent >= 0 ? "positive" : "negative"}>

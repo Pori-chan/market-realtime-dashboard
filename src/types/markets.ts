@@ -1,3 +1,5 @@
+export type MarketTrend = "up" | "down" | "flat";
+
 export type Market = {
     symbol: string;
     basePrice: number;
@@ -6,4 +8,5 @@ export type Market = {
     flash: "up" | "down" | null;
     flashKey: number;
     history: number[];
+    trend: MarketTrend;
 };

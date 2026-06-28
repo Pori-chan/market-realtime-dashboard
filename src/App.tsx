@@ -48,6 +48,11 @@ function App() {
           const previousPrice = market.price;
           const nextPrice = mockTrade.price;
           const nextChangePercent = ((nextPrice - market.basePrice) / market.basePrice) * 100;
+          const trend = nextChangePercent > 0
+            ? "up"
+            : nextChangePercent < 0
+              ? "down"
+              : "flat";
 
           return {
             ...market,
@@ -56,6 +61,7 @@ function App() {
             flash: nextPrice >= previousPrice ? "up" : "down",
             flashKey: market.flashKey + 1,
             history: [...market.history, nextPrice].slice(-20),
+            trend,
           };
         });
       });
@@ -111,6 +117,11 @@ function App() {
             const previousPrice = market.price;
             const nextPrice = latestTrade.price;
             const nextChangePercent = ((nextPrice - market.basePrice) / market.basePrice) * 100;
+            const trend = nextChangePercent > 0
+              ? "up"
+              : nextChangePercent < 0
+                ? "down"
+                : "flat";
 
             return {
               ...market,
@@ -119,6 +130,7 @@ function App() {
               flash: nextPrice >= previousPrice ? "up" : "down",
               flashKey: market.flashKey + 1,
               history: [...market.history, nextPrice].slice(-20),
+              trend,
             };
           });
         });

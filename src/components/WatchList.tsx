@@ -17,12 +17,8 @@ export function WatchList({ title, markets }: WatchListProps) {
 
           <Sparkline
             values={stock.history}
-            trend={stock.changePercent > 0
-              ? "up"
-              : stock.changePercent < 0
-                ? "down"
-                : "flat"
-            } />
+            trend={stock.trend}
+          />
 
           <div className="watch-item-value">
             <div key={stock.flashKey}

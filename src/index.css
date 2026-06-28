@@ -62,6 +62,46 @@ body {
   border-bottom: none;
 }
 
+.watch-item-value {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.watch-price {
+  padding: 2px 6px;
+  border-radius: 6px;
+  transition: background-color 0.4s ease;
+}
+
+.flash-up {
+  animation: flashUp 0.5s ease;
+}
+
+.flash-down {
+  animation: flashDown 0.5s ease;
+}
+
+@keyframes flashUp {
+  0% {
+    background-color: rgba(34, 197, 94, 0.45);
+  }
+
+  100% {
+    background-color: transparent;
+  }
+}
+
+@keyframes flashDown {
+  0% {
+    background-color: rgba(239, 68, 68, 0.45);
+  }
+
+  100% {
+    background-color: transparent;
+  }
+}
+
 .positive {
   color: #22c55e;
 }
@@ -125,7 +165,7 @@ body {
   gap: 6px;
   font-size: 13px;
   color: #cbd5e1;
-  width:156px;
+  width: 156px;
 }
 
 .demo-status {

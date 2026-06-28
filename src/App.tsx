@@ -41,21 +41,22 @@ function App() {
         return [mockTrade, ...currentTrades].slice(0, 100);
       });
 
-       setMarkets((currentMarkets) => {
-          return currentMarkets.map((market) => {
-            if(market.symbol !== mockTrade.symbol) return market;
+      setMarkets((currentMarkets) => {
+        return currentMarkets.map((market) => {
+          if (market.symbol !== mockTrade.symbol) return market;
 
-            const previousPrice = market.price;
-            const nextPrice = mockTrade.price;
-            const nextChangePercent = ((nextPrice - previousPrice) / previousPrice) * 100;
+          const previousPrice = market.price;
+          const nextPrice = mockTrade.price;
+          const nextChangePercent = ((nextPrice - market.basePrice) / market.basePrice) * 100;
 
-            return {
-              ...market,
-              price: nextPrice,
-              changePercent: Number(nextChangePercent.toFixed(2)),
-            };
-          });
+          return {
+            ...market,
+            price: nextPrice,
+            changePercent: Number(nextChangePercent.toFixed(2)),
+            flash: nextPrice >= previousPrice ? "up" : "down",
+          };
         });
+      });
 
     }, 500);
 
@@ -107,12 +108,13 @@ function App() {
 
             const previousPrice = market.price;
             const nextPrice = latestTrade.price;
-            const nextChangePercent = ((nextPrice - previousPrice) / previousPrice) * 100;
+            const nextChangePercent = ((nextPrice - market.basePrice) / market.basePrice) * 100;
 
             return {
               ...market,
               price: nextPrice,
               changePercent: Number(nextChangePercent.toFixed(2)),
+              flash: nextPrice >= previousPrice ? "up" : "down",
             };
           });
         });
@@ -137,7 +139,7 @@ function App() {
       />
 
       <main className="dashboard">
-        <WatchList title={t.watchList} markets={markets}/>
+        <WatchList title={t.watchList} markets={markets} />
         <TradeStream title={t.tradeStream} trades={trades} />
         <StatsPanel title={t.statistics} />
       </main>

@@ -1,5 +1,7 @@
 export type Market = {
-    symbol:string;
-    price:number;
+    symbol: string;
+    basePrice: number;
+    price: number;
     changePercent: number;
+    flash: "up" | "down" | null;
 };

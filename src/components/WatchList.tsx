@@ -1,3 +1,7 @@
 export function WatchList() {
-  return <div>WatchList</div>;
+  return (
+    <section className="panel">
+      <h2>Watch List</h2>
+    </section>
+  );
 }

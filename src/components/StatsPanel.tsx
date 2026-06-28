@@ -1,3 +1,7 @@
 export function StatsPanel() {
-  return <div>StatsPanel</div>;
+    return (
+        <section className="panel">
+            <h2>Satistics</h2>
+        </section>
+    );
 }

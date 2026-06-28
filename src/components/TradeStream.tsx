@@ -1,3 +1,7 @@
 export function TradeStream() {
-  return <div>TradeStream</div>;
+    return (
+        <section className="panel">
+            <h2>Trade Stream</h2>
+        </section>
+    )
 }

@@ -8,7 +8,7 @@ function App(){
     <>
       <Header />
 
-      <main>
+      <main className="dashboard">
         <WatchList/>
         <TradeStream/>
         <StatsPanel/>

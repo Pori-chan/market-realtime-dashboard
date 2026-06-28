@@ -15,5 +15,5 @@ export async function fetchUsMarketStatus() {
         throw new Error("Failed to fetch market status");
     }
 
-    return response.json();
+    return response;
 }

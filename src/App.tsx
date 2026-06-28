@@ -10,6 +10,7 @@ import type { Language } from "./types/language";
 import { messages } from "./i18n/messages";
 import { fetchUsMarketStatus } from "./services/finnhubService";
 import { getUsMarketSessionInfo } from "./utils/usMarketHours";
+import { generateMockTrade } from "./utils/mockTrade";
 
 
 function App() {
@@ -35,6 +36,20 @@ function App() {
 
     return () => clearInterval(timer);
   })
+
+  useEffect(() => {
+    if (marketSession.isOpen) return;
+
+    const timer = setInterval(() => {
+      const mockTrade = generateMockTrade();
+
+      setTrades((currentTrades) => {
+        return [mockTrade, ...currentTrades].slice(0, 100);
+      });
+    }, 500);
+
+    return () => clearInterval(timer);
+  }, [marketSession.isOpen])
 
   useEffect(() => {
     const socket = connectFinnhub();

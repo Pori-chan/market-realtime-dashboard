@@ -8,7 +8,7 @@ export function generateMockTrade():Trade{
     const volume = Math.floor(1+Math.random()*500);
 
     return {
-        id:`$symbol}-${Date.now()}-${Math.random()}`,
+        id:crypto.randomUUID(),
         symbol,
         price:Number(price.toFixed(2)),
         volume,

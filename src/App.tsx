@@ -1,18 +1,18 @@
+import { useEffect, useState } from "react";
 import { Header } from "./components/Header";
 import { StatsPanel } from "./components/StatsPanel";
 import { TradeStream } from "./components/TradeStream";
 import { WatchList } from "./components/WatchList";
-import { useEffect, useState } from "react";
+import { messages } from "./i18n/messages";
 import { connectFinnhub } from "./services/finnhubService";
 import type { FinnhubMessage } from "./types/finnhub";
-import type { Trade } from "./types/trade";
 import type { Language } from "./types/language";
-import { messages } from "./i18n/messages";
-import { getUsMarketSessionInfo } from "./utils/usMarketHours";
-import { generateMockTrade } from "./utils/mockTrade";
 import type { Market } from "./types/markets";
-import { watchList } from "./data/watchList";
-
+import type { Trade } from "./types/trade";
+import { generateMockTrade } from "./utils/mockTrade";
+import { formatDuration } from "./utils/time";
+import { formatCountdown, getUsMarketSessionInfo } from "./utils/usMarketHours";
+import { initializeMarkets } from "./services/marketInitializer";
 
 function App() {
   const [connected, setConnected] = useState(false);
@@ -20,16 +20,29 @@ function App() {
   const [language, setLanguage] = useState<Language>("ja");
   const [marketSession, setMarketSession] = useState(getUsMarketSessionInfo());
   const [demoMode, setDemoMode] = useState(false);
-  const [markets, setMarkets] = useState<Market[]>(watchList);
+  const [markets, setMarkets] = useState<Market[]>([]);
+  const [startTime] = useState(() => Date.now());
+  const [now, setNow] = useState(Date.now());
   const t = messages[language];
 
   useEffect(() => {
     const timer = setInterval(() => {
+      setNow(Date.now());
       setMarketSession(getUsMarketSessionInfo());
     }, 1000);
 
     return () => clearInterval(timer);
-  })
+  }, [])
+
+  useEffect(() => {
+    initializeMarkets()
+      .then((initialMarkets) => {
+        setMarkets(initialMarkets);
+      })
+      .catch((error) => {
+        console.error("Failed to initialize markets", error);
+      });
+  }, []);
 
   useEffect(() => {
     if (marketSession.isOpen || !demoMode) return;
@@ -95,7 +108,7 @@ function App() {
 
       if (message.type === "trade") {
         const newTrades: Trade[] = message.data.map((trade) => ({
-          id: `${trade.s}-${trade.t}-${trade.p}-${trade.v}`,
+          id: crypto.randomUUID(),
           symbol: trade.s,
           price: trade.p,
           volume: trade.v,
@@ -157,7 +170,23 @@ function App() {
       <main className="dashboard">
         <WatchList title={t.watchList} markets={markets} />
         <TradeStream title={t.tradeStream} trades={trades} />
-        <StatsPanel title={t.statistics} />
+        <StatsPanel
+          title={t.statistics}
+
+          connected={connected}
+          demoMode={demoMode}
+          marketOpen={marketSession.isOpen}
+
+          totalTrades={trades.length}
+          displayedTrades={trades.length}
+
+          watchListCount={markets.length}
+
+          uptime={formatDuration(now - startTime)}
+          nextOpenCountdown={formatCountdown(
+            marketSession.nextOpenAt
+          )}
+        />
       </main>
     </>
   )

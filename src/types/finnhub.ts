@@ -15,3 +15,8 @@ export type FinnhubTrade = {
 };
 
 export type FinnhubMessage = FinnhubPingMessage | FinnhubTradeMessage;
+
+export type FinnhubQuote={
+    c:number; //current price
+    pc:number; //previous close
+};

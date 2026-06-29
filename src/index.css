@@ -145,16 +145,57 @@ body {
 
 .trade-row {
   display: grid;
-  grid-template-columns: 100px 80px 1fr 80px;
+  grid-template-columns: 110px 70px 1fr 80px;
   gap: 12px;
+  align-items: center;
+
   padding: 8px 0;
-  border-bottom: 1px solid #1e293b;
+  border-radius: 8px;
+  border: 1px solid #1e293b;
+  background: rgba(15, 23, 42, 0.75);
+
   font-size: 14px;
+  animation: tradeFadeIn 0.25s ease;
 }
 
 .trade-row span:nth-child(3),
 .trade-row span:nth-child(4) {
   text-align: right;
+}
+
+.trade-time {
+  color: #94a3b8;
+  font-variant-numeric: tabular-nums;
+}
+
+.trade-symbol {
+  color: #e5e7eb
+}
+
+.trade-price,
+.trade-volume {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.trade-price {
+  color: #38bdf8;
+}
+
+.trade-volume {
+  color: #cbd5e1
+}
+
+@keyframes tradeFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
 }
 
 .header-actions {
@@ -193,4 +234,19 @@ body {
 .demo-status.active {
   color: #facc15;
   font-weight: bold;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  row-gap: 12px;
+  column-gap: 20px;
+}
+
+.stats-grid span {
+  color: #94a3b8;
+}
+
+.stats-grid strong {
+  text-align: right;
 }

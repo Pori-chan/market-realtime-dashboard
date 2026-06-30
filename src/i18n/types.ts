@@ -1,0 +1,27 @@
+export type Translation = {
+    title: string;
+    watchList: string;
+    tradeStream: string;
+    statistics: string;
+    connected: string;
+    disconnected: string;
+    settings: string;
+    language: string;
+    opening: string;
+    nextOpen: string;
+    demoMode: string;
+    demoRunning: string;
+    demoOff: string;
+    connection: string;
+    market: string;
+    closed: string;
+    opened: string;
+    demo: string;
+    enabled: string;
+    disabled: string;
+    totalTrades: string;
+    displayed: string;
+    uptime: string;
+    searchSymbol: string;
+    addSymbolError: (symbol: string) => string;
+};

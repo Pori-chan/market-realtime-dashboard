@@ -1,21 +1,6 @@
-import type { Language } from "../types/language";
+import type { Language, Translation } from "./types";
 
-export const messages: Record<Language, Record<string, string>> = {
-    ja: {
-        title: "リアルタイム市場ダッシュボード",
-        watchList: "監視銘柄",
-        tradeStream: "取引ストリーム",
-        statistics: "統計",
-        connected: "接続中",
-        disconnected: "未接続",
-        setting: "設定",
-        language: "言語",
-        opening: "開場中",
-        nextOpen: "次回開場まで",
-        demoMode: "デモモード",
-        demoRunning: "デモモードで稼働中",
-        demoOff: "デモ停止中",
-    },
+export const messages: Record<Language, Translation> = {
     en: {
         title: "Live Market Dashboard",
         watchList: "Watch List",
@@ -30,5 +15,46 @@ export const messages: Record<Language, Record<string, string>> = {
         demoMode: "Demo Mode",
         demoRunning: "Running in Demo Mode",
         demoOff: "Demo Off",
+        connection: "Connection",
+        market: "Market",
+        closed: "Closed",
+        opened: "Opened",
+        demo: "Demo",
+        enabled: "Enabled",
+        disabled: "Disabled",
+        totalTrades: "TotalTrades",
+        displayed: "Displayed",
+        uptime: "Uptime",
+        searchSymbol: "Search symbol...",
+        addSymbolError: (symbol: string) =>
+            `Could not add ${symbol}. Quote data is not availabe`,
     },
-};
+    ja: {
+        title: "リアルタイム市場ダッシュボード",
+        watchList: "ウォッチリスト",
+        tradeStream: "取引ストリーム",
+        statistics: "統計",
+        connected: "接続中",
+        disconnected: "未接続",
+        settings: "設定",
+        language: "言語",
+        opening: "開場中",
+        nextOpen: "次回開場まで",
+        demoMode: "デモモード",
+        demoRunning: "デモモードで稼働中",
+        demoOff: "デモ停止中",
+        connection: "接続",
+        market: "市場",
+        closed: "閉場中",
+        opened: "開場中",
+        demo: "デモモード",
+        enabled: "有効",
+        disabled: "無効",
+        totalTrades: "全トレード",
+        displayed: "表示中",
+        uptime: "起動時間",
+        searchSymbol: "銘柄を検索...",
+        addSymbolError: (symbol: string) =>
+            `${symbol}を追加できませんでした。株価データが取得できません。`,
+    },
+} as const;

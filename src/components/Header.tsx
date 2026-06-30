@@ -1,4 +1,4 @@
-import type { Language } from "../types/language";
+import type { Language, Translation } from "../i18n/types";
 import type { MarketSessionInfo } from "../utils/usMarketHours";
 import { formatCountdown } from "../utils/usMarketHours";
 
@@ -6,7 +6,7 @@ type HeaderProps = {
     connected: boolean;
     language: Language;
     onLanguageChange: (language: Language) => void;
-    t: Record<string, string>;
+    t: Translation;
     marketSession: MarketSessionInfo;
     demoMode: boolean;
     onDemoModeChange: (enabled: boolean) => void;

@@ -13,6 +13,9 @@ import { generateMockTrade } from "./utils/mockTrade";
 import { formatDuration } from "./utils/time";
 import { formatCountdown, getUsMarketSessionInfo } from "./utils/usMarketHours";
 import { initializeMarkets } from "./services/marketInitializer";
+import type { FinnhubSymbolSearchResult } from "./types/finnhub";
+import { fetchQuote, searchSymbols } from "./services/finnhubService";
+
 
 function App() {
   const [connected, setConnected] = useState(false);
@@ -23,7 +26,38 @@ function App() {
   const [markets, setMarkets] = useState<Market[]>([]);
   const [startTime] = useState(() => Date.now());
   const [now, setNow] = useState(Date.now());
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<FinnhubSymbolSearchResult[]>([]);
   const t = messages[language];
+
+    async function handleAddSymbol(symbol: string) {
+    if (markets.some((market) => market.symbol === symbol)) {
+      return;
+    }
+
+    const quote = await fetchQuote(symbol);
+
+    const basePrice = quote.pc;
+    const price = quote.c;
+    const changePercent = basePrice === 0 ? 0 : ((price - basePrice) / basePrice) * 100;
+
+    setMarkets((currentMarkets) => [
+      ...currentMarkets,
+      {
+        symbol,
+        basePrice,
+        price,
+        changePercent: Number(changePercent.toFixed(2)),
+        flash: null,
+        flashKey: 0,
+        history: [price],
+        trend: changePercent > 0 ? "up" : changePercent < 0 ? "down" : "flat",
+      },
+    ]);
+
+    setSearchQuery("");
+    setSearchResults([]);
+  }
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -155,6 +189,20 @@ function App() {
     };
 
   }, []);
+
+  useEffect(() => {
+    if (searchQuery.trim().length < 2) {
+      setSearchResults([]);
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      searchSymbols(searchQuery)
+        .then((response) => setSearchResults(response.result))
+        .catch((error) => console.error("Failed to search symbols", error));
+    }, 300);
+  })
+
   return (
     <>
       <Header
@@ -168,7 +216,14 @@ function App() {
       />
 
       <main className="dashboard">
-        <WatchList title={t.watchList} markets={markets} />
+        <WatchList
+          title={t.watchList}
+          markets={markets}
+          searchQuery={searchQuery}
+          searchResults={searchResults}
+          onSearchQueryChange={setSearchQuery}
+          onAddSymbol={handleAddSymbol}
+        />
         <TradeStream title={t.tradeStream} trades={trades} />
         <StatsPanel
           title={t.statistics}

@@ -16,7 +16,19 @@ export type FinnhubTrade = {
 
 export type FinnhubMessage = FinnhubPingMessage | FinnhubTradeMessage;
 
-export type FinnhubQuote={
-    c:number; //current price
-    pc:number; //previous close
+export type FinnhubQuote = {
+    c: number; //current price
+    pc: number; //previous close
 };
+
+export type FinnhubSymbolSearchResult = {
+    description: string;
+    displaySymbol: string;
+    symbol: string;
+    type: string;
+};
+
+export type FinnhubSymbolSearchResonse = {
+    count: number;
+    result: FinnhubSymbolSearchResult[];
+}

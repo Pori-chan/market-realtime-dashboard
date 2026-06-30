@@ -1,17 +1,45 @@
+import type { FinnhubSymbolSearchResult } from "../types/finnhub";
 import type { Market } from "../types/markets";
 import { Sparkline } from "./Sparkline";
 
 type WatchListProps = {
   title: string;
   markets: Market[];
+  searchQuery: string;
+  searchResults: FinnhubSymbolSearchResult[];
+  onSearchQueryChange: (query: string) => void;
+  onAddSymbol: (symbol: string) => void;
 };
 
-export function WatchList({ title, markets }: WatchListProps) {
+export function WatchList(props: WatchListProps) {
   return (
     <section className="panel">
-      <h2>{title}</h2>
+      <h2>{props.title}</h2>
 
-      {markets.map((stock) => (
+      <div className="symbol-search">
+        <input
+          value={props.searchQuery}
+          onChange={(event) => props.onSearchQueryChange(event.target.value)}
+          placeholder="Search symbol..."
+        />
+
+        {props.searchResults.length > 0 && (
+          <div className="search-results">
+            {props.searchResults.slice(0, 5).map((result) => (
+              <button
+                key={result.symbol}
+                type="button"
+                onClick={() => props.onAddSymbol(result.symbol)}
+              >
+                <strong>{result.symbol}</strong>
+                <span>{result.description}</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {props.markets.map((stock) => (
         <div className="watch-item" key={stock.symbol}>
           <div className="watch-symbol">{stock.symbol}</div>
 

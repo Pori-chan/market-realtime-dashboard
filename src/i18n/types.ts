@@ -1,3 +1,5 @@
+export type Language = "ja" | "en";
+
 export type Translation = {
     title: string;
     watchList: string;
@@ -24,4 +26,5 @@ export type Translation = {
     uptime: string;
     searchSymbol: string;
     addSymbolError: (symbol: string) => string;
+    removeSymbol: (symbol: string) => string;
 };

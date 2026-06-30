@@ -28,6 +28,8 @@ export const messages: Record<Language, Translation> = {
         searchSymbol: "Search symbol...",
         addSymbolError: (symbol: string) =>
             `Could not add ${symbol}. Quote data is not availabe`,
+        removeSymbol: (symbol: string) =>
+            `Remove ${symbol}`,
     },
     ja: {
         title: "リアルタイム市場ダッシュボード",
@@ -56,5 +58,7 @@ export const messages: Record<Language, Translation> = {
         searchSymbol: "銘柄を検索...",
         addSymbolError: (symbol: string) =>
             `${symbol}を追加できませんでした。株価データが取得できません。`,
+        removeSymbol: (symbol: string) =>
+            `${symbol}を削除`,
     },
 } as const;

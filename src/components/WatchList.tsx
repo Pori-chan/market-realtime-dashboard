@@ -11,6 +11,7 @@ type WatchListProps = {
   onSearchQueryChange: (query: string) => void;
   onAddSymbol: (symbol: string) => void;
   addSymbolError: string;
+  onRemoveSymbol: (symbol: string) => void;
 };
 
 export function WatchList(props: WatchListProps) {
@@ -36,6 +37,7 @@ export function WatchList(props: WatchListProps) {
                 key={result.symbol}
                 type="button"
                 onClick={() => props.onAddSymbol(result.symbol)}
+                aria-label={`${props.t.removeSymbol(result.symbol)}`}
               >
                 <strong>{result.symbol}</strong>
                 <span>{result.description}</span>
@@ -67,6 +69,14 @@ export function WatchList(props: WatchListProps) {
               {stock.changePercent > 0 ? "+" : ""}{stock.changePercent.toFixed(2)}%
             </div>
           </div>
+
+          <button
+            type="button"
+            className="remove-symbol-button"
+            onClick={() => props.onRemoveSymbol(stock.symbol)}
+          >
+            ×
+          </button>
         </div>
       ))}
     </section>

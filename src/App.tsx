@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Header } from "./components/Header";
 import { StatsPanel } from "./components/StatsPanel";
 import { TradeStream } from "./components/TradeStream";
@@ -27,6 +27,9 @@ function App() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<FinnhubSymbolSearchResult[]>([]);
   const [addSymbolError, setAddSymbolError] = useState("");
+
+  const socketRef = useRef<WebSocket | null>(null);
+
   const t = messages[language];
 
   async function handleAddSymbol(symbol: string) {
@@ -64,12 +67,31 @@ function App() {
         },
       ]);
 
+      const socket = socketRef.current;
+
+      if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({ type: "subscribe", symbol })
+        );
+      }
+
       setSearchQuery("");
       setSearchResults([]);
 
     } catch (error) {
       console.error("Failed to add symbol:", symbol, error);
       setAddSymbolError(t.addSymbolError(symbol))
+    }
+  }
+
+  function handleRemoveSymbol(symbol: string) {
+    setMarkets((currentMarkets) =>
+      currentMarkets.filter((market) => market.symbol !== symbol)
+    );
+
+    const socket = socketRef.current;
+
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      socket.send(JSON.stringify({ type: "unsubscribe", symbol }));
     }
   }
 
@@ -134,6 +156,7 @@ function App() {
 
   useEffect(() => {
     const socket = connectFinnhub();
+    socketRef.current = socket;
 
     socket.onopen = () => {
       setConnected(true);
@@ -145,6 +168,7 @@ function App() {
 
     socket.onclose = () => {
       setConnected(false);
+      socketRef.current = null;
     };
 
     socket.onmessage = (event) => {
@@ -200,6 +224,7 @@ function App() {
 
     return () => {
       socket.close();
+      socketRef.current = null;
     };
 
   }, []);
@@ -213,8 +238,8 @@ function App() {
     const timer = setTimeout(() => {
       searchSymbols(searchQuery)
         .then((response) => {
-          const filteredResults = response.result.filter((result)=>{
-            return(
+          const filteredResults = response.result.filter((result) => {
+            return (
               result.type === "Common Stock" && /^[A-Z]+$/.test(result.symbol)
             );
           });
@@ -247,6 +272,7 @@ function App() {
           onSearchQueryChange={setSearchQuery}
           onAddSymbol={handleAddSymbol}
           addSymbolError={addSymbolError}
+          onRemoveSymbol={handleRemoveSymbol}
         />
         <TradeStream title={t.tradeStream} trades={trades} />
         <StatsPanel

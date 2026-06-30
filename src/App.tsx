@@ -13,6 +13,7 @@ import type { Trade } from "./types/trade";
 import { generateMockTrade } from "./utils/mockTrade";
 import { formatDuration } from "./utils/time";
 import { formatCountdown, getUsMarketSessionInfo } from "./utils/usMarketHours";
+import { loadSymbols, resetSymbols, saveSymbols } from "./services/watchListStorage";
 
 
 function App() {
@@ -95,6 +96,12 @@ function App() {
     }
   }
 
+  async function handleResetSymbols() {
+    const symbols = resetSymbols();
+    const initialMarkets = await initializeMarkets(symbols);
+    setMarkets(initialMarkets);
+  }
+
   useEffect(() => {
     const timer = setInterval(() => {
       setNow(Date.now());
@@ -105,7 +112,7 @@ function App() {
   }, [])
 
   useEffect(() => {
-    initializeMarkets()
+    initializeMarkets(loadSymbols())
       .then((initialMarkets) => {
         setMarkets(initialMarkets);
       })
@@ -113,6 +120,12 @@ function App() {
         console.error("Failed to initialize markets", error);
       });
   }, []);
+
+  useEffect(() => {
+    if (markets.length === 0) return;
+
+    saveSymbols(markets.map((market) => market.symbol));
+  }, [markets]);
 
   useEffect(() => {
     if (marketSession.isOpen || !demoMode) return;
@@ -273,6 +286,7 @@ function App() {
           onAddSymbol={handleAddSymbol}
           addSymbolError={addSymbolError}
           onRemoveSymbol={handleRemoveSymbol}
+          onResetSymbols={handleResetSymbols}
         />
         <TradeStream title={t.tradeStream} trades={trades} />
         <StatsPanel

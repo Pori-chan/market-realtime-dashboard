@@ -1,10 +1,9 @@
-import { watchSymbols } from "../data/watchList";
-import { fetchQuote } from "./finnhubService";
 import type { Market, MarketTrend } from "../types/markets";
+import { fetchQuote } from "./finnhubService";
 
-export async function initializeMarkets(): Promise<Market[]> {
+export async function initializeMarkets(symbols:string[]): Promise<Market[]> {
     const markets = await Promise.all(
-        watchSymbols.map(async (symbol) => {
+        symbols.map(async (symbol) => {
             const quote = await fetchQuote(symbol);
 
             const basePrice = quote.pc;

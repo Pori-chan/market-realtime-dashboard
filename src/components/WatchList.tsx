@@ -12,6 +12,7 @@ type WatchListProps = {
   onAddSymbol: (symbol: string) => void;
   addSymbolError: string;
   onRemoveSymbol: (symbol: string) => void;
+  onResetSymbols: () => void;
 };
 
 export function WatchList(props: WatchListProps) {
@@ -46,6 +47,13 @@ export function WatchList(props: WatchListProps) {
           </div>
         )}
       </div>
+      <button
+        type="button"
+        className="reset-watchlist-button"
+        onClick={props.onResetSymbols}
+      >
+        {props.t.resetWatchList}
+      </button>
 
 
       {props.markets.map((stock) => (

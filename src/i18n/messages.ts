@@ -30,6 +30,7 @@ export const messages: Record<Language, Translation> = {
             `Could not add ${symbol}. Quote data is not availabe`,
         removeSymbol: (symbol: string) =>
             `Remove ${symbol}`,
+        resetWatchList:"Reset",
     },
     ja: {
         title: "リアルタイム市場ダッシュボード",
@@ -60,5 +61,6 @@ export const messages: Record<Language, Translation> = {
             `${symbol}を追加できませんでした。株価データが取得できません。`,
         removeSymbol: (symbol: string) =>
             `${symbol}を削除`,
+        resetWatchList:"初期銘柄に戻す",
     },
 } as const;

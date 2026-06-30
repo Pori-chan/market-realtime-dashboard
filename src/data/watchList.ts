@@ -8,4 +8,4 @@ import type { Market } from "../types/markets";
 //     { symbol: "META", basePrice: 732.81, price: 732.81, changePercent: 0, flash: null, flashKey: 0, history: [732.81], trend: "flat", },
 // ];
 
-export const watchSymbols=["AAPL","MSFT","NVDA","TSLA","META"];
+export const defaultSymbols = ["AAPL", "MSFT", "NVDA", "TSLA", "META"];

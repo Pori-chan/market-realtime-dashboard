@@ -212,7 +212,14 @@ function App() {
 
     const timer = setTimeout(() => {
       searchSymbols(searchQuery)
-        .then((response) => setSearchResults(response.result))
+        .then((response) => {
+          const filteredResults = response.result.filter((result)=>{
+            return(
+              result.type === "Common Stock" && /^[A-Z]+$/.test(result.symbol)
+            );
+          });
+          setSearchResults(filteredResults);
+        })
         .catch((error) => console.error("Failed to search symbols", error));
     }, 300);
 

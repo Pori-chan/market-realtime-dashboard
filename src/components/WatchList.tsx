@@ -2,6 +2,7 @@ import type { Translation } from "../i18n/types";
 import type { FinnhubSymbolSearchResult } from "../types/finnhub";
 import type { Market } from "../types/markets";
 import { Sparkline } from "./Sparkline";
+import type { SortKey } from "../types/markets";
 
 type WatchListProps = {
   t: Translation;
@@ -13,6 +14,8 @@ type WatchListProps = {
   addSymbolError: string;
   onRemoveSymbol: (symbol: string) => void;
   onResetSymbols: () => void;
+  sortKey: string;
+  onSortKeyChange: (sortKey: SortKey) => void;
 };
 
 export function WatchList(props: WatchListProps) {
@@ -46,6 +49,30 @@ export function WatchList(props: WatchListProps) {
             ))}
           </div>
         )}
+      </div>
+
+      <div className="sort-buttons">
+        <button
+          type="button"
+          className={props.sortKey==="symbol"?"active":""}
+          onClick={()=>props.onSortKeyChange("symbol")}
+          >
+            {props.t.symbol}
+        </button>
+        <button
+          type="button"
+          className={props.sortKey==="price"?"active":""}
+          onClick={()=>props.onSortKeyChange("price")}
+          >
+            {props.t.price}
+        </button>
+        <button
+          type="button"
+          className={props.sortKey==="changePercent"?"active":""}
+          onClick={()=>props.onSortKeyChange("changePercent")}
+          >
+            {props.t.changePercent}
+        </button>
       </div>
       <button
         type="button"

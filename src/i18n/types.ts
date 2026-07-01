@@ -27,4 +27,8 @@ export type Translation = {
     searchSymbol: string;
     addSymbolError: (symbol: string) => string;
     removeSymbol: (symbol: string) => string;
+    resetWatchList:string;
+    symbol: string;
+    price: string;
+    changePercent: string;
 };

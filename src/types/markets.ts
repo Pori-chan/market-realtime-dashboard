@@ -1,4 +1,5 @@
 export type MarketTrend = "up" | "down" | "flat";
+export type SortKey = "symbol" | "price" | "changePercent";
 
 export type Market = {
     symbol: string;

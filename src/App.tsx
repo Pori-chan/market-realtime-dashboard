@@ -8,7 +8,7 @@ import { type Language } from "./i18n/types";
 import { connectFinnhub, fetchQuote, searchSymbols } from "./services/finnhubService";
 import { initializeMarkets } from "./services/marketInitializer";
 import type { FinnhubMessage, FinnhubSymbolSearchResult } from "./types/finnhub";
-import type { Market } from "./types/markets";
+import type { Market, SortKey } from "./types/markets";
 import type { Trade } from "./types/trade";
 import { generateMockTrade } from "./utils/mockTrade";
 import { formatDuration } from "./utils/time";
@@ -28,10 +28,23 @@ function App() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<FinnhubSymbolSearchResult[]>([]);
   const [addSymbolError, setAddSymbolError] = useState("");
+  const [sortKey, setSortKey] = useState<SortKey>("symbol");
 
   const socketRef = useRef<WebSocket | null>(null);
 
   const t = messages[language];
+
+  const sortedMarkets = [...markets].sort((a, b) => {
+    if (sortKey === "symbol") {
+      return a.symbol.localeCompare(b.symbol);
+    }
+
+    if (sortKey === "price") {
+      return b.price - a.price;
+    }
+
+    return b.changePercent - a.changePercent;;
+  })
 
   async function handleAddSymbol(symbol: string) {
     try {
@@ -279,7 +292,7 @@ function App() {
       <main className="dashboard">
         <WatchList
           t={t}
-          markets={markets}
+          markets={sortedMarkets}
           searchQuery={searchQuery}
           searchResults={searchResults}
           onSearchQueryChange={setSearchQuery}
@@ -287,6 +300,8 @@ function App() {
           addSymbolError={addSymbolError}
           onRemoveSymbol={handleRemoveSymbol}
           onResetSymbols={handleResetSymbols}
+          sortKey={sortKey}
+          onSortKeyChange={setSortKey}
         />
         <TradeStream title={t.tradeStream} trades={trades} />
         <StatsPanel

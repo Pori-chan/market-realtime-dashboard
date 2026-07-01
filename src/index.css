@@ -326,6 +326,29 @@ body {
   color: #94a3b8;
 }
 
+.sort-buttons{
+  display: flex;
+  gap: 6px;
+  margin:8px 0 12px;
+}
+
+.sort-buttons button{
+  flex:1;
+  padding:6px 8px;
+  border:1px solid #334155;
+  border-radius:8px;
+  background:transparent;
+  color:#94a3b8;
+  cursor:pointer;
+  font-size:12px;
+}
+
+.sort-buttons button:hover,
+.sort-buttons button.active{
+  background:#1e293b;
+  color:#e5e7eb;
+}
+
 .reset-watchlist-button {
   margin-top: 8px;
   width: 100%;

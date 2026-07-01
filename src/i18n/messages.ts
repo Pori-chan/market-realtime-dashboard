@@ -31,6 +31,9 @@ export const messages: Record<Language, Translation> = {
         removeSymbol: (symbol: string) =>
             `Remove ${symbol}`,
         resetWatchList:"Reset",
+        symbol: "Symbol",
+        price: "Price",
+        changePercent: "Change %",
     },
     ja: {
         title: "リアルタイム市場ダッシュボード",
@@ -62,5 +65,8 @@ export const messages: Record<Language, Translation> = {
         removeSymbol: (symbol: string) =>
             `${symbol}を削除`,
         resetWatchList:"初期銘柄に戻す",
+        symbol: "銘柄",
+        price: "株価",
+        changePercent: "変化率",
     },
 } as const;

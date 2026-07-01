@@ -16,6 +16,8 @@ type WatchListProps = {
   onResetSymbols: () => void;
   sortKey: string;
   onSortKeyChange: (sortKey: SortKey) => void;
+  seledctedSymbol: string | null;
+  onSelectSymbol: (symbol: string) => void;
 };
 
 export function WatchList(props: WatchListProps) {
@@ -84,7 +86,11 @@ export function WatchList(props: WatchListProps) {
 
 
       {props.markets.map((stock) => (
-        <div className="watch-item" key={stock.symbol}>
+        <div 
+          className={`watch-item ${props.seledctedSymbol===stock.symbol?"selected":""}`}
+          key={stock.symbol}
+          onClick={()=>props.onSelectSymbol(stock.symbol)
+          }>
           <div className="watch-symbol">{stock.symbol}</div>
 
           <Sparkline
@@ -108,7 +114,10 @@ export function WatchList(props: WatchListProps) {
           <button
             type="button"
             className="remove-symbol-button"
-            onClick={() => props.onRemoveSymbol(stock.symbol)}
+            onClick={(event) => {
+              event?.stopPropagation();
+              props.onRemoveSymbol(stock.symbol);
+            }}
           >
             ×
           </button>

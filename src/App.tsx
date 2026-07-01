@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { Header } from "./components/Header";
 import { StatsPanel } from "./components/StatsPanel";
 import { TradeStream } from "./components/TradeStream";
@@ -6,7 +6,7 @@ import { WatchList } from "./components/WatchList";
 import { messages } from "./i18n/messages";
 import { type Language } from "./i18n/types";
 import { connectFinnhub, fetchQuote, searchSymbols } from "./services/finnhubService";
-import { initializeMarkets } from "./services/marketInitializer";
+import { createMarketFromQuote, initializeMarkets } from "./services/marketInitializer";
 import type { FinnhubMessage, FinnhubSymbolSearchResult } from "./types/finnhub";
 import type { Market, SortKey } from "./types/markets";
 import type { Trade } from "./types/trade";
@@ -14,6 +14,8 @@ import { generateMockTrade } from "./utils/mockTrade";
 import { formatDuration } from "./utils/time";
 import { formatCountdown, getUsMarketSessionInfo } from "./utils/usMarketHours";
 import { loadSymbols, resetSymbols, saveSymbols } from "./services/watchListStorage";
+import { defaultSymbols } from "./data/watchList";
+import { LargetChart } from "./components/LargetChart";
 
 
 function App() {
@@ -29,22 +31,43 @@ function App() {
   const [searchResults, setSearchResults] = useState<FinnhubSymbolSearchResult[]>([]);
   const [addSymbolError, setAddSymbolError] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("symbol");
+  const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null);
 
   const socketRef = useRef<WebSocket | null>(null);
 
   const t = messages[language];
 
-  const sortedMarkets = [...markets].sort((a, b) => {
-    if (sortKey === "symbol") {
-      return a.symbol.localeCompare(b.symbol);
-    }
+  const sortedMarkets = useMemo(() => {
+    return [...markets].sort((a, b) => {
+      if (sortKey === "symbol") {
+        return a.symbol.localeCompare(b.symbol);
+      }
 
-    if (sortKey === "price") {
-      return b.price - a.price;
-    }
+      if (sortKey === "price") {
+        return b.price - a.price;
+      }
 
-    return b.changePercent - a.changePercent;;
-  })
+      return b.changePercent - a.changePercent;
+    });
+  }, [markets, sortKey]);
+
+  const selectedMarket = markets.find((market) => market.symbol === selectedSymbol) ?? null;
+
+  function sendSocketMessage(message: object): void {
+    const socket = socketRef.current;
+
+    if (!socket || socket.readyState !== WebSocket.OPEN) return;
+
+    socket.send(JSON.stringify(message));
+  }
+
+  function subscribeToSymbol(symbol: string): void {
+    sendSocketMessage({ type: "subscribe", symbol });
+  }
+
+  function unsubscribeFromSymbol(symbol: string): void {
+    sendSocketMessage({ type: "unsubscribe", symbol });
+  }
 
   async function handleAddSymbol(symbol: string) {
     try {
@@ -57,35 +80,13 @@ function App() {
       }
 
       const quote = await fetchQuote(symbol);
-
-      if (quote.c === 0 || quote.pc === 0) {
-        console.warn("No quote data:", symbol, quote);
-        return;
-      }
-
-      const basePrice = quote.pc;
-      const price = quote.c;
-      const changePercent = basePrice === 0 ? 0 : ((price - basePrice) / basePrice) * 100;
-
-      setMarkets((currentMarkets) => [
-        ...currentMarkets,
-        {
-          symbol,
-          basePrice,
-          price,
-          changePercent: Number(changePercent.toFixed(2)),
-          flash: null,
-          flashKey: 0,
-          history: [price],
-          trend: changePercent > 0 ? "up" : changePercent < 0 ? "down" : "flat",
-        },
-      ]);
+      const newMarket = createMarketFromQuote(symbol, quote);
+      setMarkets((currentMarkets) => [...currentMarkets, newMarket]);
 
       const socket = socketRef.current;
 
       if (socket && socket.readyState === WebSocket.OPEN) {
-        socket.send(JSON.stringify({ type: "subscribe", symbol })
-        );
+        subscribeToSymbol(symbol);
       }
 
       setSearchQuery("");
@@ -105,7 +106,7 @@ function App() {
     const socket = socketRef.current;
 
     if (socket && socket.readyState === WebSocket.OPEN) {
-      socket.send(JSON.stringify({ type: "unsubscribe", symbol }));
+      unsubscribeFromSymbol(symbol);
     }
   }
 
@@ -113,6 +114,12 @@ function App() {
     const symbols = resetSymbols();
     const initialMarkets = await initializeMarkets(symbols);
     setMarkets(initialMarkets);
+  }
+
+  function handleSelectSymbol(symbol: string) {
+    setSelectedSymbol((currentSelected) =>
+      currentSelected === symbol ? null : symbol
+    );
   }
 
   useEffect(() => {
@@ -170,6 +177,7 @@ function App() {
             flash: nextPrice >= previousPrice ? "up" : "down",
             flashKey: market.flashKey + 1,
             history: [...market.history, nextPrice].slice(-20),
+            chartHistory: [...market.chartHistory, nextPrice].slice(-100),
             trend,
           };
         });
@@ -187,8 +195,8 @@ function App() {
     socket.onopen = () => {
       setConnected(true);
 
-      ["AAPL", "MSFT", "NVDA", "TSLA", "META"].forEach((symbol) => {
-        socket.send(JSON.stringify({ type: "subscribe", symbol, }));
+      defaultSymbols.forEach((symbol) => {
+        subscribeToSymbol(symbol);
       });
     };
 
@@ -241,6 +249,7 @@ function App() {
               flash: nextPrice >= previousPrice ? "up" : "down",
               flashKey: market.flashKey + 1,
               history: [...market.history, nextPrice].slice(-20),
+              chartHistory: [...market.chartHistory, nextPrice].slice(-100),
               trend,
             };
           });
@@ -302,8 +311,18 @@ function App() {
           onResetSymbols={handleResetSymbols}
           sortKey={sortKey}
           onSortKeyChange={setSortKey}
+          seledctedSymbol={selectedSymbol}
+          onSelectSymbol={handleSelectSymbol}
         />
-        <TradeStream title={t.tradeStream} trades={trades} />
+
+        <div className={`center-panel ${selectedMarket ? "chart-open" : ""}`}>
+          <div className="large-chart-wrapper">
+            <LargetChart market={selectedMarket} />
+          </div>
+
+          <TradeStream title={t.tradeStream} trades={trades} />
+        </div>
+
         <StatsPanel
           t={t}
           connected={connected}

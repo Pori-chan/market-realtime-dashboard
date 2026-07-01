@@ -4,7 +4,7 @@ type SparklineProps = {
 };
 
 export function Sparkline({ values, trend }: SparklineProps) {
-    const width = 80;
+    const width = 88;
     const height = 28;
 
     if (values.length < 2) {

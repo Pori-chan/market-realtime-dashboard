@@ -9,5 +9,6 @@ export type Market = {
     flash: "up" | "down" | null;
     flashKey: number;
     history: number[];
+    chartHistory:number[];
     trend: MarketTrend;
 };

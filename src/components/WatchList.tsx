@@ -1,3 +1,4 @@
+import { memo } from "react";
 import type { Translation } from "../i18n/types";
 import type { FinnhubSymbolSearchResult } from "../types/finnhub";
 import type { Market } from "../types/markets";
@@ -20,7 +21,7 @@ type WatchListProps = {
   onSelectSymbol: (symbol: string) => void;
 };
 
-export function WatchList(props: WatchListProps) {
+export const WatchList = memo(function WatchList(props: WatchListProps) {
   return (
     <section className="panel">
       <h2>{props.t.watchList}</h2>
@@ -125,4 +126,4 @@ export function WatchList(props: WatchListProps) {
       ))}
     </section>
   );
-}
+});

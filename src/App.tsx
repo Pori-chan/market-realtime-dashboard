@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useMemo } from "react";
+import { useCallback, useEffect, useState, useRef, useMemo } from "react";
 import { Header } from "./components/Header";
 import { StatsPanel } from "./components/StatsPanel";
 import { TradeStream } from "./components/TradeStream";
@@ -11,12 +11,37 @@ import type { FinnhubMessage, FinnhubSymbolSearchResult } from "./types/finnhub"
 import type { Market, SortKey } from "./types/markets";
 import type { Trade } from "./types/trade";
 import { generateMockTrade } from "./utils/mockTrade";
-import { formatDuration } from "./utils/time";
-import { formatCountdown, getUsMarketSessionInfo } from "./utils/usMarketHours";
+import { getUsMarketSessionInfo } from "./utils/usMarketHours";
 import { loadSymbols, resetSymbols, saveSymbols } from "./services/watchListStorage";
 import { defaultSymbols } from "./data/watchList";
 import { LargetChart } from "./components/LargetChart";
 
+function applyTradeToMarket(market: Market, trade: Trade): Market {
+  const previousPrice = market.price;
+  const nextPrice = trade.price;
+  const nextChangePercent = ((nextPrice - market.basePrice) / market.basePrice) * 100;
+  const trend = nextChangePercent > 0
+    ? "up"
+    : nextChangePercent < 0
+      ? "down"
+      : "flat";
+
+  return {
+    ...market,
+    price: nextPrice,
+    changePercent: Number(nextChangePercent.toFixed(2)),
+    flash: nextPrice >= previousPrice ? "up" : "down",
+    flashKey: market.flashKey + 1,
+    history: [...market.history, nextPrice].slice(-20),
+    chartHistory: [...market.chartHistory,
+    {
+      price: nextPrice,
+      timestamp: trade.timestamp,
+    },
+    ].slice(-100),
+    trend,
+  };
+}
 
 function App() {
   const [connected, setConnected] = useState(false);
@@ -25,7 +50,6 @@ function App() {
   const [marketSession, setMarketSession] = useState(getUsMarketSessionInfo());
   const [demoMode, setDemoMode] = useState(false);
   const [markets, setMarkets] = useState<Market[]>([]);
-  const [startTime] = useState(() => Date.now());
   const [now, setNow] = useState(Date.now());
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<FinnhubSymbolSearchResult[]>([]);
@@ -51,25 +75,69 @@ function App() {
     });
   }, [markets, sortKey]);
 
-  const selectedMarket = markets.find((market) => market.symbol === selectedSymbol) ?? null;
+  const selectedMarket = useMemo(() => {
+    return markets.find((market) => market.symbol === selectedSymbol) ?? null;
+  }, [markets, selectedSymbol]);
 
-  function sendSocketMessage(message: object): void {
+  const tradesPerMinute = useMemo(() => {
+    return trades.filter((trade) => now - trade.timestamp <= 60_000).length;
+  }, [now, trades]);
+
+  const mostActiveSymbol = useMemo(() => {
+    const tradeCounts = trades.reduce<Record<string, number>>((counts, trade) => {
+      counts[trade.symbol] = (counts[trade.symbol] ?? 0) + 1;
+      return counts;
+    }, {});
+
+    return Object.entries(tradeCounts).reduce(
+      (mostActive, [symbol, count]) =>
+        count > mostActive.count ? { symbol, count } : mostActive,
+      { symbol: "-", count: 0 }
+    ).symbol;
+  }, [trades]);
+
+  const { topGainer, topLoser } = useMemo(() => {
+    return markets.reduce<{
+      topGainer: Market | null;
+      topLoser: Market | null;
+    }>(
+      (stats, market) => ({
+        topGainer: !stats.topGainer || market.changePercent > stats.topGainer.changePercent
+          ? market
+          : stats.topGainer,
+        topLoser: !stats.topLoser || market.changePercent < stats.topLoser.changePercent
+          ? market
+          : stats.topLoser,
+      }),
+      { topGainer: null, topLoser: null }
+    );
+  }, [markets]);
+
+  const avgTradeSize = useMemo(() => {
+    return trades.length > 0
+      ? Math.round(trades.reduce((sum, trade) => sum + trade.volume, 0) / trades.length)
+      : 0;
+  }, [trades]);
+
+  const lastTrade = useMemo(() => trades[0] ?? null, [trades]);
+
+  const sendSocketMessage = useCallback((message: object): void => {
     const socket = socketRef.current;
 
     if (!socket || socket.readyState !== WebSocket.OPEN) return;
 
     socket.send(JSON.stringify(message));
-  }
+  }, []);
 
-  function subscribeToSymbol(symbol: string): void {
+  const subscribeToSymbol = useCallback((symbol: string): void => {
     sendSocketMessage({ type: "subscribe", symbol });
-  }
+  }, [sendSocketMessage]);
 
-  function unsubscribeFromSymbol(symbol: string): void {
+  const unsubscribeFromSymbol = useCallback((symbol: string): void => {
     sendSocketMessage({ type: "unsubscribe", symbol });
-  }
+  }, [sendSocketMessage]);
 
-  async function handleAddSymbol(symbol: string) {
+  const handleAddSymbol = useCallback(async (symbol: string) => {
     try {
       setAddSymbolError("");
 
@@ -96,9 +164,9 @@ function App() {
       console.error("Failed to add symbol:", symbol, error);
       setAddSymbolError(t.addSymbolError(symbol))
     }
-  }
+  }, [markets, subscribeToSymbol, t]);
 
-  function handleRemoveSymbol(symbol: string) {
+  const handleRemoveSymbol = useCallback((symbol: string) => {
     setMarkets((currentMarkets) =>
       currentMarkets.filter((market) => market.symbol !== symbol)
     );
@@ -108,19 +176,19 @@ function App() {
     if (socket && socket.readyState === WebSocket.OPEN) {
       unsubscribeFromSymbol(symbol);
     }
-  }
+  }, [unsubscribeFromSymbol]);
 
-  async function handleResetSymbols() {
+  const handleResetSymbols = useCallback(async () => {
     const symbols = resetSymbols();
     const initialMarkets = await initializeMarkets(symbols);
     setMarkets(initialMarkets);
-  }
+  }, []);
 
-  function handleSelectSymbol(symbol: string) {
+  const handleSelectSymbol = useCallback((symbol: string) => {
     setSelectedSymbol((currentSelected) =>
       currentSelected === symbol ? null : symbol
     );
-  }
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -161,29 +229,11 @@ function App() {
         return currentMarkets.map((market) => {
           if (market.symbol !== mockTrade.symbol) return market;
 
-          const previousPrice = market.price;
-          const nextPrice = mockTrade.price;
-          const nextChangePercent = ((nextPrice - market.basePrice) / market.basePrice) * 100;
-          const trend = nextChangePercent > 0
-            ? "up"
-            : nextChangePercent < 0
-              ? "down"
-              : "flat";
-
-          return {
-            ...market,
-            price: nextPrice,
-            changePercent: Number(nextChangePercent.toFixed(2)),
-            flash: nextPrice >= previousPrice ? "up" : "down",
-            flashKey: market.flashKey + 1,
-            history: [...market.history, nextPrice].slice(-20),
-            chartHistory: [...market.chartHistory, nextPrice].slice(-100),
-            trend,
-          };
+          return applyTradeToMarket(market, mockTrade);
         });
       });
 
-    }, 500);
+    }, 100);
 
     return () => clearInterval(timer);
   }, [marketSession.isOpen, demoMode])
@@ -226,32 +276,22 @@ function App() {
         });
 
         setMarkets((currentMarkets) => {
+          const latestTradeBySymbol = newTrades.reduce<Map<string, Trade>>((tradesBySymbol, trade) => {
+            const currentTrade = tradesBySymbol.get(trade.symbol);
+
+            if (!currentTrade || trade.timestamp > currentTrade.timestamp) {
+              tradesBySymbol.set(trade.symbol, trade);
+            }
+
+            return tradesBySymbol;
+          }, new Map());
+
           return currentMarkets.map((market) => {
-            const latestTrade = newTrades.find(
-              (trade) => trade.symbol === market.symbol
-            );
+            const latestTrade = latestTradeBySymbol.get(market.symbol);
 
             if (!latestTrade) return market;
 
-            const previousPrice = market.price;
-            const nextPrice = latestTrade.price;
-            const nextChangePercent = ((nextPrice - market.basePrice) / market.basePrice) * 100;
-            const trend = nextChangePercent > 0
-              ? "up"
-              : nextChangePercent < 0
-                ? "down"
-                : "flat";
-
-            return {
-              ...market,
-              price: nextPrice,
-              changePercent: Number(nextChangePercent.toFixed(2)),
-              flash: nextPrice >= previousPrice ? "up" : "down",
-              flashKey: market.flashKey + 1,
-              history: [...market.history, nextPrice].slice(-20),
-              chartHistory: [...market.chartHistory, nextPrice].slice(-100),
-              trend,
-            };
+            return applyTradeToMarket(market, latestTrade);
           });
         });
       }
@@ -262,7 +302,7 @@ function App() {
       socketRef.current = null;
     };
 
-  }, []);
+  }, [subscribeToSymbol]);
 
   useEffect(() => {
     if (searchQuery.trim().length < 2) {
@@ -325,19 +365,13 @@ function App() {
 
         <StatsPanel
           t={t}
-          connected={connected}
-          demoMode={demoMode}
-          marketOpen={marketSession.isOpen}
-
-          totalTrades={trades.length}
-          displayedTrades={trades.length}
-
+          tradesPerMinute={tradesPerMinute}
+          mostActiveSymbol={mostActiveSymbol}
+          topGainer={topGainer}
+          topLoser={topLoser}
+          avgTradeSize={avgTradeSize}
+          lastTrade={lastTrade}
           watchListCount={markets.length}
-
-          uptime={formatDuration(now - startTime)}
-          nextOpenCountdown={formatCountdown(
-            marketSession.nextOpenAt
-          )}
         />
       </main>
     </>

@@ -32,7 +32,7 @@ export function createMarketFromQuote(
         flash: null,
         flashKey: 0,
         history: [price],
-        chartHistory: [price],
+        chartHistory: [{price, timestamp: Date.now()}],
         trend,
     };
 }

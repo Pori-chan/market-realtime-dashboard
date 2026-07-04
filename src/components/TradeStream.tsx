@@ -1,3 +1,4 @@
+import { memo } from "react";
 import type { Trade } from "../types/trade"
 
 type TradeStreamProps = {
@@ -5,7 +6,7 @@ type TradeStreamProps = {
     title: string;
 };
 
-export function TradeStream({ trades,title }: TradeStreamProps) {
+export const TradeStream = memo(function TradeStream({ trades,title }: TradeStreamProps) {
     return (
         <section className="panel">
             <h2>{title}</h2>
@@ -30,4 +31,4 @@ export function TradeStream({ trades,title }: TradeStreamProps) {
             </div>
         </section>
     );
-}
+});

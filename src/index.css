@@ -390,7 +390,7 @@ body {
   grid-template-rows: 0fr 1fr;
   gap: 0;
   min-width: 0;
-  transition:grid-template-rows 0.35s ease,gap 0.35s ease;
+  transition: grid-template-rows 0.35s ease, gap 0.35s ease;
 }
 
 .center-panel.chart-open {
@@ -439,11 +439,77 @@ body {
   align-items: strech;
 }
 
-.chart-scale{
+.large-chart-main {
+  position:relative;
+  min-width: 0;
+}
+
+.chart-grid-line {
+  stroke: rgba(148, 163, 184, 0.22)
+}
+
+.current-price-dot{
+  fill:currentColor;
+  animation:currentPricePulse 1.2s ease-in-out infinite;
+}
+
+.hover-price-dot{
+  fill:currentColor;
+}
+
+.chart-crosshair{
+  stroke:rgba(226,232,240,0.35);
+  stroke-width:1;
+  stroke-dasharray:4 4;
+}
+
+.chart-tooltip {
+  position: absolute;
+  padding:8px 10px;
+  border:1px solid #334155;
+  border-radius:8px;
+  background:rgba(2,6,23,0.92);
+  color:#e5e7eb;
+  font-size:12px;
+  font-variant-numeric:tabular-nums;
+  pointer-events:none;
+}
+
+.chart-tooltip strong{
+  display:block;
+  margin-top:2px;
+}
+
+@keyframes currentPricePulse{
+  0%{
+    r:4;
+    opacity:0.7;
+  }
+  50%{
+    r:7;
+    opacity:1;
+  }
+  100%{
+    r:4;
+    opacity:0.7;
+  }
+}
+
+.chart-price-axis {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  color:#94a3b8;
+  color: #94a3b8;
   font-size: 12px;
   text-align: right;
+  padding: 4px 0 22px;
+}
+
+.chart-time-axis {
+  display: flex;
+  justify-content: space-between;
+  color: #94a3b8;
+  font-size: 12px;
+  padding: 4px 16px 0;
+  font-variant-numeric: tabular-nums;
 }
